@@ -70,6 +70,9 @@ router.post('/:id/edit', isAdmin, (req, res) => {
 
   if (!name) {
     Project.findById(projectId, (err, project) => {
+      if (err || !project) {
+        return res.status(404).send('Project not found');
+      }
       return res.render('project-form', { project, user: req.session, error: 'Project name is required' });
     });
     return;

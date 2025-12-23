@@ -37,7 +37,13 @@ router.post('/new/:projectId', isAuthenticated, (req, res) => {
 
   if (!title) {
     Project.findById(projectId, (err, project) => {
+      if (err || !project) {
+        return res.status(404).send('Project not found');
+      }
       User.getAll((err, users) => {
+        if (err) {
+          return res.status(500).send('Error fetching users');
+        }
         return res.render('bug-form', { 
           bug: null, 
           project, 
@@ -119,8 +125,17 @@ router.post('/:id/edit', isAuthenticated, (req, res) => {
 
   if (!title) {
     Bug.findById(bugId, (err, bug) => {
+      if (err || !bug) {
+        return res.status(404).send('Bug not found');
+      }
       Project.findById(bug.project_id, (err, project) => {
+        if (err || !project) {
+          return res.status(404).send('Project not found');
+        }
         User.getAll((err, users) => {
+          if (err) {
+            return res.status(500).send('Error fetching users');
+          }
           return res.render('bug-form', { 
             bug, 
             project, 
