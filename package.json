@@ -1,0 +1,21 @@
+{
+  "name": "bug-tracker",
+  "version": "1.0.0",
+  "description": "A simple bug tracking system with User/Admin roles, Projects, Bugs, and Comments",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "body-parser": "^2.2.1",
+    "ejs": "^3.1.10",
+    "express": "^5.2.1",
+    "express-session": "^1.18.2",
+    "sqlite3": "^5.1.7"
+  }
+}

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bug #<%= bug.id %>: <%= bug.title %> - Bug Tracker</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f5f5f5; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    header { background-color: #2c3e50; color: white; padding: 1rem 0; margin-bottom: 2rem; }
+    header .container { display: flex; justify-content: space-between; align-items: center; }
+    header h1 { font-size: 1.5rem; }
+    nav a { color: white; text-decoration: none; margin-left: 1rem; padding: 0.5rem 1rem; border-radius: 4px; transition: background-color 0.3s; }
+    nav a:hover { background-color: #34495e; }
+    .btn { display: inline-block; padding: 0.5rem 1rem; background-color: #3498db; color: white; text-decoration: none; border-radius: 4px; border: none; cursor: pointer; font-size: 1rem; transition: background-color 0.3s; }
+    .btn:hover { background-color: #2980b9; }
+    .btn-danger { background-color: #e74c3c; }
+    .btn-danger:hover { background-color: #c0392b; }
+    .btn-secondary { background-color: #95a5a6; }
+    .btn-secondary:hover { background-color: #7f8c8d; }
+    .card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 1rem; }
+    .badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.875rem; font-weight: 500; margin-right: 0.5rem; }
+    .badge-open { background-color: #3498db; color: white; }
+    .badge-in-progress { background-color: #f39c12; color: white; }
+    .badge-resolved { background-color: #27ae60; color: white; }
+    .badge-closed { background-color: #95a5a6; color: white; }
+    .badge-low { background-color: #95a5a6; color: white; }
+    .badge-medium { background-color: #f39c12; color: white; }
+    .badge-high { background-color: #e74c3c; color: white; }
+    .bug-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1rem 0; padding: 1rem; background-color: #f8f9fa; border-radius: 4px; }
+    .meta-item { }
+    .meta-label { font-weight: 600; color: #7f8c8d; font-size: 0.875rem; }
+    .meta-value { color: #2c3e50; }
+    .action-buttons { display: flex; gap: 0.5rem; margin-top: 1rem; }
+    .comment { padding: 1rem; background-color: #f8f9fa; border-radius: 4px; margin-bottom: 1rem; }
+    .comment-author { font-weight: 600; color: #2c3e50; }
+    .comment-date { font-size: 0.875rem; color: #7f8c8d; margin-left: 0.5rem; }
+    .comment-content { margin-top: 0.5rem; }
+    .form-group { margin-bottom: 1rem; }
+    textarea { width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; min-height: 80px; resize: vertical; font-family: inherit; }
+    .user-info { display: flex; align-items: center; gap: 1rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>🐛 Bug Tracker</h1>
+      <nav class="user-info">
+        <span>Welcome, <%= user.username %> (<%= user.role %>)</span>
+        <a href="/projects">Projects</a>
+        <a href="/logout">Logout</a>
+      </nav>
+    </div>
+  </header>
+  
+  <div class="container">
+    <div class="card">
+      <p><a href="/projects/<%= bug.project_id %>" style="color: #7f8c8d; text-decoration: none;">← Back to <%= bug.project_name %></a></p>
+      <h2>Bug #<%= bug.id %>: <%= bug.title %></h2>
+      
+      <div style="margin: 1rem 0;">
+        <span class="badge badge-<%= bug.status.toLowerCase().replace(' ', '-') %>"><%= bug.status %></span>
+        <span class="badge badge-<%= bug.priority.toLowerCase() %>"><%= bug.priority %></span>
+      </div>
+
+      <div class="bug-meta">
+        <div class="meta-item">
+          <div class="meta-label">Created By</div>
+          <div class="meta-value"><%= bug.creator_name %></div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">Assigned To</div>
+          <div class="meta-value"><%= bug.assignee_name || 'Unassigned' %></div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">Created</div>
+          <div class="meta-value"><%= new Date(bug.created_at).toLocaleString() %></div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">Last Updated</div>
+          <div class="meta-value"><%= new Date(bug.updated_at).toLocaleString() %></div>
+        </div>
+      </div>
+
+      <div style="margin-top: 1rem;">
+        <h4>Description</h4>
+        <p style="margin-top: 0.5rem;"><%= bug.description || 'No description provided' %></p>
+      </div>
+      
+      <div class="action-buttons">
+        <a href="/bugs/<%= bug.id %>/edit" class="btn">Edit Bug</a>
+        <form method="POST" action="/bugs/<%= bug.id %>/delete" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this bug?');">
+          <button type="submit" class="btn btn-danger">Delete Bug</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Comments (<%= comments.length %>)</h3>
+      
+      <% if (comments.length === 0) { %>
+        <p style="color: #7f8c8d; margin: 1rem 0;">No comments yet. Be the first to comment!</p>
+      <% } else { %>
+        <div style="margin-top: 1rem;">
+          <% comments.forEach(comment => { %>
+            <div class="comment">
+              <div>
+                <span class="comment-author"><%= comment.author_name %></span>
+                <span class="comment-date"><%= new Date(comment.created_at).toLocaleString() %></span>
+              </div>
+              <div class="comment-content"><%= comment.content %></div>
+            </div>
+          <% }); %>
+        </div>
+      <% } %>
+
+      <form method="POST" action="/bugs/<%= bug.id %>/comments">
+        <div class="form-group">
+          <label for="content"><strong>Add Comment</strong></label>
+          <textarea id="content" name="content" placeholder="Write your comment here..." required></textarea>
+        </div>
+        <button type="submit" class="btn">Post Comment</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
