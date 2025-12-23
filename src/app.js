@@ -17,7 +17,12 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'bug-tracker-secret-key-change-in-production',
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 24 * 60 * 60 * 1000 } // 24 hours
+  cookie: { 
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+    sameSite: 'strict' // CSRF protection
+  }
 }));
 
 // Set view engine
