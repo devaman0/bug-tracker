@@ -1,4 +1,4 @@
-// User schema: auth + role only, nothing fancy
+// User model = identity + auth
 
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
@@ -6,23 +6,35 @@ const bcrypt = require("bcryptjs");
 const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
+
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true, // avoid case mistakes
+    },
+
     password: { type: String, required: true },
-    role: { type: String, enum: ["user", "admin"], default: "user" },
+
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    },
   },
   { timestamps: true }
 );
 
-// Hash password before saving — never use arrow function here
-userSchema.pre("save", async function () {
-  if (!this.isModified("password")) return;
+// Hash password before save — normal function is mandatory
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 10);
-  // No next() needed with async/await - Mongoose handles it automatically
+  next();
 });
 
-// Compare password during login
-userSchema.methods.comparePassword = async function (candidatePassword) {
-  return bcrypt.compare(candidatePassword, this.password);
+// Used during login — compares plain vs hash
+userSchema.methods.matchPassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
 };
 
 module.exports = mongoose.model("User", userSchema);
