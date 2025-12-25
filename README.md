@@ -6,27 +6,6 @@ The project focuses on backend fundamentals: authentication, authorization, role
 
 ---
 
-## Quick Evaluation Guide (60–90s skim)
-
-**What to check first**
-
-* JWT-based authentication works (register → login → token)
-* Role-based access is enforced (admin vs user)
-* Ownership rules are enforced at API level
-* APIs behave consistently and return stable responses
-
-**How to verify quickly**
-
-1. Run the Postman collection in order
-2. Login stores JWT automatically
-3. Create project (admin)
-4. Create bug → assign → update status
-5. Try the same actions with a non-admin / non-owner
-
-If an action is not allowed, the API rejects it.
-
----
-
 ## Project Overview
 
 The system is used to track bugs inside projects using text, status flow, assignments, and comments.
@@ -261,4 +240,3 @@ Authorization: Bearer {{token}}
 Ownership and role restrictions can be verified by logging in as different users.
 
 ---
-
