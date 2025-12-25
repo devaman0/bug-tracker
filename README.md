@@ -1,26 +1,97 @@
 # Bug Tracking System (MERN)
 
 A simple bug tracking system built with the MERN stack.
-This README is self-sufficient — anyone can start working without asking for clarification.
+
+The project focuses on backend fundamentals: authentication, authorization, role handling, ownership checks, and clean APIs.
 
 ---
 
-## Purpose
+## Quick Evaluation Guide (60–90s skim)
 
-Track bugs using structured text, ownership, and status flow.
+**What to check first**
+
+* JWT-based authentication works (register → login → token)
+* Role-based access is enforced (admin vs user)
+* Ownership rules are enforced at API level
+* APIs behave consistently and return stable responses
+
+**How to verify quickly**
+
+1. Run the Postman collection in order
+2. Login stores JWT automatically
+3. Create project (admin)
+4. Create bug → assign → update status
+5. Try the same actions with a non-admin / non-owner
+
+If an action is not allowed, the API rejects it.
+
+---
+
+## Project Overview
+
+The system is used to track bugs inside projects using text, status flow, assignments, and comments.
+
+Users work inside projects, report bugs, update progress, and discuss issues through comments. Access to data is controlled strictly through roles and ownership rules.
 
 ---
 
 ## Features
 
-* User authentication (JWT)
-* Create and manage projects
-* Report bugs inside projects
-* Assign bugs to users
-* Update bug status: Open → In Progress → Resolved → Closed
-* Comment on bugs for discussion and history
+### Authentication
 
-No file uploads. No notifications. Text-based tracking only.
+* User registration and login
+* JWT-based authentication
+* Protected API routes
+
+### Projects
+
+* Project creation (admin only)
+* View all projects (authenticated users)
+
+### Bugs
+
+* Create bugs inside projects
+* Bug status flow:
+  **Open → In Progress → Resolved → Closed**
+* Assign bugs to users
+* Filter bugs by status and priority
+
+### Comments
+
+* Add comments on bugs
+* View all comments for a bug
+
+Text-based tracking only.
+
+---
+
+## Roles and Permissions
+
+### User
+
+* Register and login
+* View projects
+* Create bugs
+* Comment on bugs
+* Update bug status if assigned
+
+### Admin
+
+* All user permissions
+* Create projects
+* Assign bugs to users
+
+---
+
+## Authorization Rules
+
+* JWT is required for all protected routes
+* Only admins can create projects
+* Only admins can assign bugs
+* Only the bug creator or assigned user can update a bug
+* Users cannot access or modify data they do not own
+
+All checks are enforced at the API level.
 
 ---
 
@@ -45,6 +116,7 @@ bug-tracker-mern/
 │   │   ├── middleware/
 │   │   └── app.js
 │   ├── server.js
+│   ├── .env.example
 │   └── package.json
 ├── client/
 │   ├── src/
@@ -54,23 +126,6 @@ bug-tracker-mern/
 │   └── package.json
 └── README.md
 ```
-
----
-
-## Roles
-
-### User
-
-* Create bugs
-* View bugs in projects
-* Comment on bugs
-* Update status of assigned bugs
-
-### Admin
-
-* All user permissions
-* Create projects
-* Assign bugs
 
 ---
 
@@ -93,8 +148,8 @@ bug-tracker-mern/
 
 * title
 * description
-* status (Open, In Progress, Resolved, Closed)
-* priority (Low, Medium, High)
+* status (open, in-progress, resolved, closed)
+* priority (low, medium, high)
 * projectId
 * createdBy
 * assignedTo
@@ -107,31 +162,41 @@ bug-tracker-mern/
 
 ---
 
-## API Responsibility Split
+## API List (Actual Routes)
 
 ### Auth
 
-* Register
-* Login
-* JWT auth middleware
+* `POST /api/auth/register`
+* `POST /api/auth/login`
 
-### Project
+### Projects
 
-* Create project (admin only)
-* Get all projects
+* `POST /api/projects` (admin only)
+* `GET /api/projects`
 
-### Bug
+### Bugs
 
-* Create bug
-* Update bug
-* Change status
-* Assign user
-* Filter by status / priority
+* `POST /api/projects/:projectId/bugs`
+* `GET /api/bugs`
+* `PUT /api/bugs/:bugId`
+* `PUT /api/bugs/:bugId/assign` (admin only)
+* `DELETE /api/bugs/:bugId`
 
-### Comment
+### Comments
 
-* Add comment to bug
-* Get comments by bug
+* `POST /api/bugs/:bugId/comments`
+* `GET /api/bugs/:bugId/comments`
+
+---
+
+## Authentication & Authorization Flow
+
+1. User registers or logs in
+2. Server returns a JWT
+3. JWT is sent in `Authorization: Bearer <token>`
+4. Auth middleware verifies the token
+5. Role and ownership checks are applied
+6. Request is allowed or rejected
 
 ---
 
@@ -145,7 +210,7 @@ npm install
 npm run dev
 ```
 
-Create `server/.env`
+Create `.env` using `.env.example`
 
 ```
 PORT=5000
@@ -163,30 +228,37 @@ npm run dev
 
 ---
 
-## Contribution Rules
+## Postman Collection
 
-* Keep scope minimal
-* No extra features
-* Commit small and often
-* Follow CRUD patterns
-* Don’t block teammates
+A Postman collection is included to test the full backend flow end-to-end.
+
+The collection covers:
+
+* User registration
+* Login and JWT token handling
+* Project creation and listing
+* Bug creation inside a project
+* Bug assignment (admin only)
+* Bug status updates
+* Adding and fetching comments
+* Bug deletion
+
+### Collection Flow
+
+* `login` request stores the JWT token as a **collection variable** (`token`)
+* `create project` stores `projectId`
+* `create bug` stores `bugId`
+* Subsequent requests reuse these variables automatically
+
+This allows the evaluator to run the collection in order without manual copy-paste.
+
+Authorization is tested using:
+
+```
+Authorization: Bearer {{token}}
+```
+
+Ownership and role restrictions can be verified by logging in as different users.
 
 ---
 
-## Status
-
-Initial setup complete.
-Next milestone: authentication + schemas.
-
----
-
-## Design Note
-
-Bug tracking is implemented via:
-
-* structured text
-* status changes
-* assignment
-* comments
-
-File uploads are intentionally excluded.
