@@ -1,11 +1,14 @@
-// Bug = issue inside a project
-
 const mongoose = require("mongoose");
 
+// Single source of truth for bug data
 const bugSchema = new mongoose.Schema(
   {
-    title: { type: String, required: true }, // short problem
-    description: { type: String }, // details if needed
+    title: {
+      type: String,
+      required: true,
+    },
+
+    description: String,
 
     status: {
       type: String,
@@ -35,6 +38,36 @@ const bugSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+
+    // Simple discussion thread per bug
+    comments: [
+      {
+        text: String,
+        author: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+        createdAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
+
+    // Auto-tracked history (status / assignment)
+    activity: [
+      {
+        action: String,
+        user: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+        at: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
   },
   { timestamps: true }
 );

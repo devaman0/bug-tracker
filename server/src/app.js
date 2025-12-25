@@ -38,4 +38,8 @@ app.get("/", (req, res) => {
   res.send("Bug Tracker API running");
 });
 
+// ❗ error handler
+const errorHandler = require("./middleware/errorMiddleware");
+app.use(errorHandler);
+
 module.exports = app;

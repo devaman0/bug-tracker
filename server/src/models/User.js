@@ -25,17 +25,19 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Hash password before save — normal function is mandatory
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-  this.password = await bcrypt.hash(this.password, 10);
-  next();
+// Hash password before saving user
+// async hook → NO next(), mongoose handles it
+userSchema.pre("save", async function () {
+  // skip if password unchanged
+  if (!this.isModified("password")) return;
+
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
 });
 
 // Used during login — compares plain vs hash
 userSchema.methods.matchPassword = async function (enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password);
+  return bcrypt.compare(enteredPassword, this.password);
 };
 
 module.exports = mongoose.model("User", userSchema);
-
