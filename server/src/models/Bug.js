@@ -1,75 +1,42 @@
-const mongoose = require("mongoose");
+import mongoose from 'mongoose';
 
-// Single source of truth for bug data
-const bugSchema = new mongoose.Schema(
-  {
-    title: {
-      type: String,
-      required: true,
-    },
-
-    description: String,
-
-    status: {
-      type: String,
-      enum: ["open", "in-progress", "resolved", "closed"],
-      default: "open",
-    },
-
-    priority: {
-      type: String,
-      enum: ["low", "medium", "high"],
-      default: "medium",
-    },
-
-    project: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Project",
-      required: true,
-    },
-
-    createdBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-
-    assignedTo: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-    },
-
-    // Simple discussion thread per bug
-    comments: [
-      {
-        text: String,
-        author: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "User",
-        },
-        createdAt: {
-          type: Date,
-          default: Date.now,
-        },
-      },
-    ],
-
-    // Auto-tracked history (status / assignment)
-    activity: [
-      {
-        action: String,
-        user: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "User",
-        },
-        at: {
-          type: Date,
-          default: Date.now,
-        },
-      },
-    ],
+const bugSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: true,
+    trim: true
   },
-  { timestamps: true }
-);
+  description: {
+    type: String,
+    required: false
+  },
+  priority: {
+    type: String,
+    enum: ['low', 'medium', 'high'],
+    default: 'medium'
+  },
+  status: {
+    type: String,
+    enum: ['open', 'in-progress', 'resolved'],
+    default: 'open'
+  },
+  // LINK TO THE PROJECT (Crucial)
+  project: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Project',
+    required: true
+  },
+  // LINK TO THE USER (Who created it)
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
+});
 
-module.exports = mongoose.model("Bug", bugSchema);
+const Bug = mongoose.model('Bug', bugSchema);
+export default Bug;

@@ -1,24 +1,20 @@
-// Project routes — all protected
-
-const express = require("express");
-const protect = require("../middleware/authMiddleware");
-const {
-  createProject,
-  getProjects,
-  getProjectById,
-  updateProject,
-  deleteProject,
-} = require("../controllers/projectController");
+import express from 'express';
+import { 
+  getProjects, 
+  getProjectById, 
+  createProject, 
+  deleteProject, 
+  updateProject 
+} from '../controllers/projectController.js';
+import { verifyToken } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.route("/")
-  .post(protect, createProject)
-  .get(protect, getProjects);
+// Routes
+router.get('/', verifyToken, getProjects);
+router.post('/', verifyToken, createProject);
+router.get('/:id', verifyToken, getProjectById);
+router.delete('/:id', verifyToken, deleteProject);
+router.put('/:id', verifyToken, updateProject);
 
-router.route("/:id")
-  .get(protect, getProjectById)
-  .put(protect, updateProject)
-  .delete(protect, deleteProject);
-
-module.exports = router;
+export default router;

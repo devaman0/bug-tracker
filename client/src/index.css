@@ -1,68 +1,269 @@
+/* --- 1. RESET & VARIABLES --- */
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+  /* Orbit Color Palette */
+  --primary: #6366f1;       /* Indigo-500 */
+  --primary-hover: #4f46e5; /* Indigo-600 */
+  --bg-color: #f9fafb;      /* Gray-50 */
+  --card-bg: #ffffff;
+  --text-main: #1f2937;     /* Gray-800 */
+  --text-muted: #6b7280;    /* Gray-500 */
+  --border: #e5e7eb;        /* Gray-200 */
+  --danger: #ef4444;        /* Red-500 */
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
+  padding: 0;
+  background-color: var(--bg-color);
+  color: var(--text-main);
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+#root {
+  width: 100%;
+  height: 100%;
 }
 
-button {
+/* --- 2. LAYOUT UTILITIES --- */
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+/* --- 3. AUTH PAGES (Login/Register) --- */
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-color);
+}
+
+.auth-card {
+  background: white;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border: 1px solid var(--border);
+}
+
+.logo-text {
+  color: var(--primary);
+  font-size: 32px;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 10px;
+  letter-spacing: -1px;
+}
+
+/* --- 4. FORMS & INPUTS --- */
+input, select, textarea {
+  padding: 12px;
+  border: 1px solid var(--border);
   border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+  box-sizing: border-box;
   font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  background: white;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+input:focus, select:focus, textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* --- 5. BUTTONS --- */
+button {
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  width: 100%;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+}
+
+.btn-icon {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  width: 42px; /* Matches input height */
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.btn-logout {
+  background: transparent;
+  border: 1px solid var(--border);
+  padding: 8px 16px;
+  border-radius: 20px;
+  color: var(--text-muted);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-logout:hover {
+  background: white;
+  color: var(--text-main);
+  border-color: var(--text-muted);
+}
+
+/* --- 6. PROJECTS GRID --- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+  border-color: var(--primary);
+}
+
+/* --- 7. NAVBAR --- */
+.navbar {
+  background: white;
+  border-bottom: 1px solid var(--border);
+  padding: 16px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo-small {
+  color: var(--primary);
+  font-weight: 800;
+  font-size: 20px;
+}
+
+/* --- 8. BUG LIST --- */
+.bug-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bug-row {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: 0.2s;
+}
+
+.bug-row:hover {
+  border-color: var(--primary);
+}
+
+.priority-badge {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-left: 8px;
+}
+
+.priority-badge.high { background: #fef2f2; color: #ef4444; border: 1px solid #fee2e2; }
+.priority-badge.medium { background: #fffbeb; color: #f59e0b; border: 1px solid #fef3c7; }
+.priority-badge.low { background: #f0fdf4; color: #22c55e; border: 1px solid #dcfce7; }
+
+.link {
+  color: var(--primary);
+  text-decoration: none;
+  font-size: 14px;
+  text-align: center;
+  display: block;
+  margin-top: 10px;
+}
+
+.link:hover { text-decoration: underline; }
+
+/* --- STATUS BADGES --- */
+.status-badge {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-left: 6px; /* Spacing from the priority badge */
+}
+
+/* Colors for each status */
+.status-badge.open { 
+  background: #f3f4f6; 
+  color: #6b7280; 
+  border: 1px solid #e5e7eb; 
+}
+
+.status-badge.in-progress { 
+  background: #eff6ff; 
+  color: #3b82f6; /* Blue */
+  border: 1px solid #dbeafe; 
+}
+
+.status-badge.resolved { 
+  background: #f0fdf4; 
+  color: #22c55e; /* Green */
+  border: 1px solid #dcfce7; 
 }

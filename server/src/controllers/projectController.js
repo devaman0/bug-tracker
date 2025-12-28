@@ -1,69 +1,94 @@
-// Project logic — CRUD, nothing else
+import Project from '../models/Project.js';
 
-const Project = require("../models/Project");
+// 1. Get All Projects (With Alias Fix)
+export const getProjects = async (req, res) => {
+  try {
+    let projects;
+    if (req.user && req.user.role === 'admin') {
+      projects = await Project.find().sort({ createdAt: -1 });
+    } else {
+      const userId = req.user?.id || req.user?._id || req.userId;
+      projects = await Project.find({ createdBy: userId }).sort({ createdAt: -1 });
+    }
 
-// Create new project
-exports.createProject = async (req, res) => {
-  const { name, description } = req.body;
+    // MAGIC FIX: Map 'createdBy' to 'owner' so your Frontend shows the buttons
+    const projectsForFrontend = projects.map(p => ({
+      ...p.toObject(),
+      owner: p.createdBy // This makes the delete button reappear!
+    }));
 
-  const project = await Project.create({
-    name,
-    description,
-    owner: req.user._id, // current logged-in user
-  });
-
-  res.status(201).json(project);
-};
-
-// Get all projects of logged-in user
-exports.getProjects = async (req, res) => {
-  const projects = await Project.find({ owner: req.user._id });
-  res.json(projects);
-};
-
-// Get single project (owner only)
-exports.getProjectById = async (req, res) => {
-  const project = await Project.findOne({
-    _id: req.params.id,
-    owner: req.user._id,
-  });
-
-  if (!project) {
-    return res.status(404).json({ message: "Project not found" });
+    res.status(200).json(projectsForFrontend);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching projects", error: error.message });
   }
-
-  res.json(project);
 };
 
-// Update project
-exports.updateProject = async (req, res) => {
-  const project = await Project.findOne({
-    _id: req.params.id,
-    owner: req.user._id,
-  });
+// 2. Get Single Project (With Alias Fix)
+export const getProjectById = async (req, res) => {
+  try {
+    const project = await Project.findById(req.params.id);
+    if (!project) return res.status(404).json({ message: "Project not found" });
 
-  if (!project) {
-    return res.status(404).json({ message: "Project not found" });
+    const userId = req.user?.id || req.user?._id || req.userId;
+    const isAdmin = req.user?.role === 'admin';
+
+    // Security check
+    if (!isAdmin && project.createdBy.toString() !== userId) {
+       return res.status(403).json({ message: "Access denied" });
+    }
+
+    // MAGIC FIX: Add 'owner' alias here too
+    const projectData = {
+      ...project.toObject(),
+      owner: project.createdBy
+    };
+
+    res.status(200).json(projectData);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching project", error: error.message });
   }
-
-  project.name = req.body.name || project.name;
-  project.description = req.body.description || project.description;
-
-  const updated = await project.save();
-  res.json(updated);
 };
 
-// Delete project
-exports.deleteProject = async (req, res) => {
-  const project = await Project.findOne({
-    _id: req.params.id,
-    owner: req.user._id,
-  });
+// 3. Create Project
+export const createProject = async (req, res) => {
+  try {
+    const userId = req.user?.id || req.user?._id || req.userId;
+    const newProject = new Project({
+      name: req.body.name,
+      description: req.body.description,
+      createdBy: userId
+    });
 
-  if (!project) {
-    return res.status(404).json({ message: "Project not found" });
+    const savedProject = await newProject.save();
+    res.status(201).json(savedProject);
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.status(400).json({ message: "Project name already exists." });
+    }
+    res.status(500).json({ message: "Error creating project", error: error.message });
   }
+};
 
-  await project.deleteOne();
-  res.json({ message: "Project deleted" });
+// 4. Delete Project
+export const deleteProject = async (req, res) => {
+  try {
+    await Project.findByIdAndDelete(req.params.id);
+    res.status(200).json({ message: "Project deleted" });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting project", error: error.message });
+  }
+};
+
+// 5. Update Project
+export const updateProject = async (req, res) => {
+  try {
+    const updatedProject = await Project.findByIdAndUpdate(
+      req.params.id, 
+      req.body, 
+      { new: true }
+    );
+    res.status(200).json(updatedProject);
+  } catch (error) {
+    res.status(500).json({ message: "Error updating project", error: error.message });
+  }
 };
