@@ -1,58 +1,37 @@
-# Bug Tracking System (MERN)
+# 🐞 Bug Tracking System | MERN + RBAC
 
-A simple bug tracking system built with the MERN stack.
+A backend-focused bug tracking system built with the MERN stack.
 
-The project focuses on backend fundamentals: authentication, authorization, role handling, ownership checks, and clean APIs.
-
----
-
-## Project Overview
-
-The system is used to track bugs inside projects using text, status flow, assignments, and comments.
-
-Users work inside projects, report bugs, update progress, and discuss issues through comments. Access to data is controlled strictly through roles and ownership rules.
+The project is intentionally scoped to demonstrate **authentication**, **role-based access control**, **ownership enforcement**, and **clean API design**, rather than UI complexity or SaaS-style features.
 
 ---
 
-## Features
+## 🔗 Live Demo
 
-### Authentication
+**Frontend:** [https://orbit-fontend.vercel.app](https://orbit-fontend.vercel.app)
+**Backend API:** [https://orbit-backend-i2rz.onrender.com](https://orbit-backend-i2rz.onrender.com)
 
-* User registration and login
-* JWT-based authentication
-* Protected API routes
-
-### Projects
-
-* Project creation (admin only)
-* View all projects (authenticated users)
-
-### Bugs
-
-* Create bugs inside projects
-* Bug status flow:
-  **Open → In Progress → Resolved → Closed**
-* Assign bugs to users
-* Filter bugs by status and priority
-
-### Comments
-
-* Add comments on bugs
-* View all comments for a bug
-
-Text-based tracking only.
+> The live deployment mirrors the local setup. All authentication, authorization, and ownership checks are enforced at the API level.
 
 ---
 
-## Roles and Permissions
+## 🧭 Project Scope
+
+The system models how teams track bugs across projects with strict access rules.
+
+Users work inside projects, report bugs, update progress through a defined status flow, and discuss issues via comments. Data access is controlled entirely by role and ownership checks on the backend.
+
+---
+
+## 👥 Roles & Permissions
 
 ### User
 
 * Register and login
 * View projects
-* Create bugs
+* Create bugs inside projects
 * Comment on bugs
-* Update bug status if assigned
+* Update bug status **only if assigned**
 
 ### Admin
 
@@ -62,60 +41,60 @@ Text-based tracking only.
 
 ---
 
-## Authorization Rules
+## 🔐 Authorization Rules
 
-* JWT is required for all protected routes
+All rules are enforced server-side:
+
+* JWT required for all protected routes
 * Only admins can create projects
 * Only admins can assign bugs
 * Only the bug creator or assigned user can update a bug
-* Users cannot access or modify data they do not own
+* Users cannot read or modify resources they do not own
 
-All checks are enforced at the API level.
-
----
-
-## Tech Stack
-
-* Frontend: React (Vite)
-* Backend: Node.js, Express
-* Database: MongoDB (Mongoose)
-* Authentication: JWT
+No permission logic is trusted to the frontend.
 
 ---
 
-## Folder Structure
+## 🧩 Core Features
 
-```
-bug-tracker-mern/
-├── server/
-│   ├── src/
-│   │   ├── models/
-│   │   ├── controllers/
-│   │   ├── routes/
-│   │   ├── middleware/
-│   │   └── app.js
-│   ├── server.js
-│   ├── .env.example
-│   └── package.json
-├── client/
-│   ├── src/
-│   │   ├── pages/
-│   │   ├── components/
-│   │   └── App.jsx
-│   └── package.json
-└── README.md
-```
+### Authentication
+
+* User registration and login
+* JWT-based authentication
+* Central auth middleware
+
+### Projects
+
+* Project creation (admin only)
+* View all projects (authenticated users)
+
+### Bugs
+
+* Create bugs inside projects
+* Status lifecycle:
+  **Open → In Progress → Resolved → Closed**
+* Priority levels:
+  **Low / Medium / High**
+* Assign bugs to users (admin only)
+* Filter bugs by status and priority
+
+### Comments
+
+* Add comments to bugs
+* Fetch all comments for a bug
+
+Text-based tracking only (intentional).
 
 ---
 
-## Data Models
+## 🧠 Data Models
 
 ### User
 
 * name
 * email
 * password (hashed)
-* role (user / admin)
+* role (`user | admin`)
 
 ### Project
 
@@ -127,8 +106,8 @@ bug-tracker-mern/
 
 * title
 * description
-* status (open, in-progress, resolved, closed)
-* priority (low, medium, high)
+* status
+* priority
 * projectId
 * createdBy
 * assignedTo
@@ -141,7 +120,7 @@ bug-tracker-mern/
 
 ---
 
-## API List (Actual Routes)
+## 🌐 API Routes
 
 ### Auth
 
@@ -168,18 +147,52 @@ bug-tracker-mern/
 
 ---
 
-## Authentication & Authorization Flow
+## 🔁 Authentication & Request Flow
 
 1. User registers or logs in
-2. Server returns a JWT
-3. JWT is sent in `Authorization: Bearer <token>`
-4. Auth middleware verifies the token
+2. Server issues a JWT
+3. JWT sent via `Authorization: Bearer <token>`
+4. Auth middleware validates token
 5. Role and ownership checks are applied
 6. Request is allowed or rejected
 
 ---
 
-## Local Setup
+## 🛠 Tech Stack
+
+* **Frontend:** React (Vite)
+* **Backend:** Node.js, Express
+* **Database:** MongoDB (Mongoose)
+* **Authentication:** JSON Web Tokens (JWT)
+
+---
+
+## 📁 Folder Structure
+
+```
+bug-tracker-mern/
+├── server/
+│   ├── src/
+│   │   ├── models/
+│   │   ├── controllers/
+│   │   ├── routes/
+│   │   ├── middleware/
+│   │   └── app.js
+│   ├── server.js
+│   ├── .env.example
+│   └── package.json
+├── client/
+│   ├── src/
+│   │   ├── pages/
+│   │   ├── components/
+│   │   └── App.jsx
+│   └── package.json
+└── README.md
+```
+
+---
+
+## ▶️ Local Setup
 
 ### Backend
 
@@ -189,7 +202,7 @@ npm install
 npm run dev
 ```
 
-Create `.env` using `.env.example`
+Create `.env` using `.env.example`:
 
 ```
 PORT=5000
@@ -207,36 +220,31 @@ npm run dev
 
 ---
 
-## Postman Collection
+## 🧪 Postman Collection
 
-A Postman collection is included to test the full backend flow end-to-end.
+A Postman collection is included to test the backend end-to-end.
 
-The collection covers:
+Covers:
 
-* User registration
-* Login and JWT token handling
+* User registration and login
+* JWT handling
 * Project creation and listing
-* Bug creation inside a project
-* Bug assignment (admin only)
+* Bug creation and assignment
 * Bug status updates
-* Adding and fetching comments
+* Comment creation and fetching
 * Bug deletion
 
 ### Collection Flow
 
-* `login` request stores the JWT token as a **collection variable** (`token`)
+* `login` stores JWT as a collection variable (`token`)
 * `create project` stores `projectId`
 * `create bug` stores `bugId`
-* Subsequent requests reuse these variables automatically
+* Subsequent requests reuse variables automatically
 
-This allows the evaluator to run the collection in order without manual copy-paste.
-
-Authorization is tested using:
+Authorization header used:
 
 ```
 Authorization: Bearer {{token}}
 ```
 
-Ownership and role restrictions can be verified by logging in as different users.
-
----
+RBAC and ownership rules can be verified by logging in as different users.
